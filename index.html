@@ -523,7 +523,7 @@
   </div>
 
   <script>
-    const API_URL = "https://chatter.cypher1010.workers.dev/";
+    const WORKER_URL = "https://chatter.cypher1010.workers.dev/";
     const messagesEl = document.getElementById("messages");
     const inputEl = document.getElementById("input");
     const fileInputEl = document.getElementById("fileInput");
@@ -657,7 +657,7 @@
       try {
         const payload = { messages: [userMsg] };
 
-        const res = await fetch(API_URL, {
+        const res = await fetch(WORKER_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
