@@ -221,7 +221,7 @@
       <div class="title">abel</div>
       <div class="status">
         <span class="dot"></span>
-        <span>DeepSeek‑V3.2 · Moondream</span>
+        <span>Gateway · dynamic/deekseek</span>
       </div>
     </div>
 
@@ -305,13 +305,23 @@
       setTyping(true);
 
       let endpoint = "/text";
-      let payload = { prompt: text };
+      let payload = {
+        // chat-style payload for compat/chat/completions
+        messages: [
+          {
+            role: "user",
+            content: text || "[Image]"
+          }
+        ]
+      };
 
       if (file) {
         endpoint = "/vision";
         const base64 = await fileToBase64(file);
-        payload.image = base64;
-        payload.prompt = text || "";
+        payload = {
+          prompt: text || "",
+          image: base64
+        };
       }
 
       try {
@@ -324,8 +334,9 @@
         const data = await res.json();
 
         const reply =
-          data?.result?.[0]?.output_text || // Moondream
-          data?.choices?.[0]?.text ||       // DeepSeek-V3.2
+          data?.choices?.[0]?.message?.content || // chat-style
+          data?.choices?.[0]?.text ||             // completion-style
+          data?.result?.[0]?.output_text ||       // Moondream
           JSON.stringify(data);
 
         setTyping(false);
