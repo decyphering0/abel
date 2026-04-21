@@ -239,7 +239,7 @@
     </div>
   </div>
 
-  <script>
+ <script>
 const WORKER = "https://chatter.cypher1010.workers.dev";
 
 const chat = document.getElementById("chat");
@@ -308,7 +308,6 @@ async function send() {
   let payload;
 
   if (file) {
-    // Vision request
     endpoint = "/vision";
     const base64 = await fileToBase64(file);
     payload = {
@@ -316,14 +315,9 @@ async function send() {
       image: base64
     };
   } else {
-    // ⭐ FIXED: Always send valid chat format
+    // ⭐ FIXED: DeepSeek-V3.2 requires prompt, not messages
     payload = {
-      messages: [
-        {
-          role: "user",
-          content: text
-        }
-      ]
+      prompt: text
     };
   }
 
@@ -337,8 +331,7 @@ async function send() {
     const data = await res.json();
 
     const reply =
-      data?.choices?.[0]?.message?.content || // chat-style
-      data?.choices?.[0]?.text ||             // completion fallback
+      data?.choices?.[0]?.text ||             // DeepSeek-V3.2
       data?.result?.[0]?.output_text ||       // Moondream
       JSON.stringify(data);
 
