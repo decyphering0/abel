@@ -125,12 +125,13 @@ sendBtn.onclick = async () => {
   imageInput.value = "";
 
   let endpoint = "/text";
-  let payload = { messages: [{ role: "user", content: text }] };
+  let payload = { prompt: text };   // <-- FIXED: DeepSeek-V3.2 expects prompt
 
   if (file) {
     endpoint = "/vision";
     const base64 = await fileToBase64(file);
     payload.image = base64;
+    payload.prompt = text || "";    // <-- Vision still uses prompt + image
   }
 
   try {
@@ -143,8 +144,8 @@ sendBtn.onclick = async () => {
     const data = await res.json();
 
     const reply =
-      data?.choices?.[0]?.message?.content ||
-      data?.message?.content ||
+      data?.result?.[0]?.output_text ||   // Moondream
+      data?.choices?.[0]?.text ||         // DeepSeek-V3.2
       JSON.stringify(data);
 
     addMessage(reply, "bot");
@@ -162,6 +163,5 @@ function fileToBase64(file) {
   });
 }
 </script>
-
 </body>
 </html>
