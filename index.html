@@ -95,7 +95,7 @@
 </div>
 
 <script>
-const WORKER_BASE = "https://chatter.cypher1010.workers.dev";
+const WORKER = "https://chatter.cypher1010.workers.dev";
 
 const chat = document.getElementById("chat");
 const textInput = document.getElementById("text");
@@ -134,7 +134,7 @@ sendBtn.onclick = async () => {
   }
 
   try {
-    const res = await fetch(WORKER_BASE + endpoint, {
+    const res = await fetch(WORKER + endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
