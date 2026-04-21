@@ -1,167 +1,352 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Abel Chat</title>
+  <meta charset="UTF-8" />
+  <title>abel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050509;
+      --panel: #0b0b12;
+      --accent: #7f5cff;
+      --accent-soft: rgba(127, 92, 255, 0.15);
+      --text: #f5f5ff;
+      --text-soft: #a0a0c0;
+      --border: #1a1a26;
+      --user: #1f2937;
+      --bot: #111827;
+      --radius: 12px;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+    }
 
-<style>
-  body {
-    margin: 0;
-    background: #0f0f0f;
-    color: #e5e5e5;
-    font-family: system-ui, sans-serif;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  #chat {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-  }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #151528 0, #050509 55%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
 
-  .msg {
-    max-width: 80%;
-    padding: 10px 14px;
-    margin: 10px 0;
-    border-radius: 10px;
-    line-height: 1.4;
-    white-space: pre-wrap;
-  }
+    .app {
+      width: 100%;
+      max-width: 720px;
+      background: linear-gradient(145deg, #070712, #050509);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-  .user {
-    background: #3a3f47;
-    align-self: flex-end;
-  }
+    .header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: radial-gradient(circle at top left, #15152a 0, #050509 60%);
+    }
 
-  .bot {
-    background: #1e1e1e;
-    border-left: 3px solid #6ab0ff;
-    align-self: flex-start;
-  }
+    .title {
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-soft);
+    }
 
-  #input-area {
-    display: flex;
-    padding: 10px;
-    background: #111;
-    gap: 10px;
-  }
+    .status {
+      font-size: 12px;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-  #text {
-    flex: 1;
-    padding: 10px;
-    border-radius: 6px;
-    border: none;
-    background: #222;
-    color: #fff;
-  }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.7);
+    }
 
-  #send {
-    padding: 10px 16px;
-    background: #6ab0ff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    color: #000;
-    font-weight: bold;
-  }
+    .chat {
+      padding: 16px;
+      height: 420px;
+      overflow-y: auto;
+      background: radial-gradient(circle at top, #101021 0, #050509 60%);
+    }
 
-  #image {
-    display: none;
-  }
+    .msg {
+      max-width: 80%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.4;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
 
-  #attach {
-    padding: 10px 16px;
-    background: #444;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    color: #fff;
-  }
-</style>
+    .msg.user {
+      margin-left: auto;
+      background: linear-gradient(135deg, #1f2937, #111827);
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg.bot {
+      margin-right: auto;
+      background: linear-gradient(135deg, #050816, #020617);
+      border-bottom-left-radius: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .msg.system {
+      margin: 8px auto;
+      max-width: 100%;
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-soft);
+      background: transparent;
+    }
+
+    .input-bar {
+      border-top: 1px solid var(--border);
+      padding: 10px;
+      background: rgba(5, 5, 12, 0.96);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #050509;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+    }
+
+    .input-wrap input[type="text"] {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .input-wrap input::placeholder {
+      color: var(--text-soft);
+    }
+
+    .icon-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(148, 163, 184, 0.08);
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s ease, transform 0.1s ease;
+      font-size: 15px;
+    }
+
+    .icon-btn:hover {
+      background: rgba(148, 163, 184, 0.18);
+      transform: translateY(-1px);
+    }
+
+    .send-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: none;
+      background: radial-gradient(circle at top left, #a855f7, #6366f1);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 18px rgba(99, 102, 241, 0.7);
+      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
+      font-size: 16px;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.4;
+      box-shadow: none;
+      cursor: default;
+    }
+
+    .send-btn:not(:disabled):hover {
+      transform: translateY(-1px);
+      box-shadow: 0 0 22px rgba(129, 140, 248, 0.9);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .typing {
+      font-size: 11px;
+      color: var(--text-soft);
+      margin-top: 4px;
+      margin-left: 4px;
+      opacity: 0.8;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <div class="header">
+      <div class="title">abel</div>
+      <div class="status">
+        <span class="dot"></span>
+        <span>DeepSeek‑V3.2 · Moondream</span>
+      </div>
+    </div>
 
-<div id="chat"></div>
+    <div id="chat" class="chat">
+      <div class="msg system">New session · text + vision</div>
+    </div>
 
-<div id="input-area">
-  <input id="text" placeholder="Message Abel..." />
-  <button id="attach">📎</button>
-  <input type="file" id="image" accept="image/*" />
-  <button id="send">Send</button>
-</div>
+    <div class="input-bar">
+      <div class="input-wrap">
+        <button id="attach" class="icon-btn" title="Attach image">📎</button>
+        <input id="text" type="text" placeholder="Ask something..." />
+        <input id="image" type="file" accept="image/*" class="hidden" />
+      </div>
+      <button id="send" class="send-btn" title="Send">➤</button>
+    </div>
+  </div>
 
-<script>
-const WORKER = "https://chatter.cypher1010.workers.dev";
+  <script>
+    const WORKER = "https://chatter.cypher1010.workers.dev";
 
-const chat = document.getElementById("chat");
-const textInput = document.getElementById("text");
-const sendBtn = document.getElementById("send");
-const attachBtn = document.getElementById("attach");
-const imageInput = document.getElementById("image");
+    const chat = document.getElementById("chat");
+    const textInput = document.getElementById("text");
+    const sendBtn = document.getElementById("send");
+    const attachBtn = document.getElementById("attach");
+    const imageInput = document.getElementById("image");
 
-function addMessage(content, cls) {
-  const div = document.createElement("div");
-  div.className = "msg " + cls;
-  div.textContent = content;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
+    let isSending = false;
+    let typingEl = null;
 
-attachBtn.onclick = () => imageInput.click();
+    function addMessage(content, cls) {
+      const div = document.createElement("div");
+      div.className = "msg " + cls;
+      div.textContent = content;
+      chat.appendChild(div);
+      chat.scrollTop = chat.scrollHeight;
+      return div;
+    }
 
-sendBtn.onclick = async () => {
-  const text = textInput.value.trim();
-  const file = imageInput.files[0];
+    function setTyping(state) {
+      if (state) {
+        if (!typingEl) {
+          typingEl = document.createElement("div");
+          typingEl.className = "typing";
+          typingEl.textContent = "thinking…";
+          chat.appendChild(typingEl);
+          chat.scrollTop = chat.scrollHeight;
+        }
+      } else {
+        if (typingEl) {
+          typingEl.remove();
+          typingEl = null;
+        }
+      }
+    }
 
-  if (!text && !file) return;
+    attachBtn.onclick = () => imageInput.click();
 
-  addMessage(text || "[Image]", "user");
-
-  textInput.value = "";
-  imageInput.value = "";
-
-  let endpoint = "/text";
-  let payload = { prompt: text };   // <-- FIXED: DeepSeek-V3.2 expects prompt
-
-  if (file) {
-    endpoint = "/vision";
-    const base64 = await fileToBase64(file);
-    payload.image = base64;
-    payload.prompt = text || "";    // <-- Vision still uses prompt + image
-  }
-
-  try {
-    const res = await fetch(WORKER + endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+    textInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        send();
+      }
     });
 
-    const data = await res.json();
+    sendBtn.onclick = () => send();
 
-    const reply =
-      data?.result?.[0]?.output_text ||   // Moondream
-      data?.choices?.[0]?.text ||         // DeepSeek-V3.2
-      JSON.stringify(data);
+    async function send() {
+      if (isSending) return;
 
-    addMessage(reply, "bot");
-  } catch (err) {
-    addMessage("Error: " + err, "bot");
-  }
-};
+      const text = textInput.value.trim();
+      const file = imageInput.files[0];
 
-function fileToBase64(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () =>
-      resolve(reader.result.replace(/^data:.+;base64,/, ""));
-    reader.readAsDataURL(file);
-  });
-}
-</script>
+      if (!text && !file) return;
+
+      addMessage(text || "[Image]", "user");
+
+      textInput.value = "";
+      imageInput.value = "";
+      sendBtn.disabled = true;
+      isSending = true;
+      setTyping(true);
+
+      let endpoint = "/text";
+      let payload = { prompt: text };
+
+      if (file) {
+        endpoint = "/vision";
+        const base64 = await fileToBase64(file);
+        payload.image = base64;
+        payload.prompt = text || "";
+      }
+
+      try {
+        const res = await fetch(WORKER + endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        const reply =
+          data?.result?.[0]?.output_text || // Moondream
+          data?.choices?.[0]?.text ||       // DeepSeek-V3.2
+          JSON.stringify(data);
+
+        setTyping(false);
+        addMessage(reply, "bot");
+      } catch (err) {
+        setTyping(false);
+        addMessage("Error: " + err, "bot");
+      } finally {
+        isSending = false;
+        sendBtn.disabled = false;
+      }
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () =>
+          resolve(reader.result.replace(/^data:.+;base64,/, ""));
+        reader.readAsDataURL(file);
+      });
+    }
+  </script>
 </body>
 </html>
