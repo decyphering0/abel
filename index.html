@@ -1,695 +1,182 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Abel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --bg: #050816;
-      --bg-alt: #0b1020;
-      --accent: #4f46e5;
-      --accent-soft: rgba(79, 70, 229, 0.15);
-      --accent-strong: #818cf8;
-      --text: #e5e7eb;
-      --text-soft: #9ca3af;
-      --danger: #f97373;
-      --radius-lg: 18px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
-      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
-      --border-subtle: 1px solid rgba(148, 163, 184, 0.18);
-      --blur: blur(18px);
-    }
+<meta charset="UTF-8">
+<title>Abel — Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --panel: #111118;
+    --user: #3a3f5a;
+    --bot: #1e1f29;
+    --accent: #4a5cff;
+    --text: #e6e6e6;
+    --subtle: #9a9a9a;
+  }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
-        "Inter", sans-serif;
-      background: radial-gradient(circle at top, #111827 0, #020617 45%, #000 100%);
-      color: var(--text);
-      display: flex;
-      align-items: stretch;
-      justify-content: center;
-      padding: 24px;
-    }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Inter", Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
 
-    .app-shell {
-      width: 100%;
-      max-width: 1100px;
-      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
-      border-radius: 28px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      box-shadow: var(--shadow-soft);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      position: relative;
-    }
+  #header {
+    padding: 16px;
+    background: var(--panel);
+    font-size: 20px;
+    font-weight: 600;
+    border-bottom: 1px solid #1b1b22;
+  }
 
-    .app-shell::before {
-      content: "";
-      position: absolute;
-      inset: -120px;
-      background:
-        radial-gradient(circle at 0% 0%, rgba(56, 189, 248, 0.08), transparent 55%),
-        radial-gradient(circle at 100% 0%, rgba(129, 140, 248, 0.12), transparent 55%),
-        radial-gradient(circle at 50% 100%, rgba(236, 72, 153, 0.08), transparent 55%);
-      opacity: 0.9;
-      filter: var(--blur);
-      pointer-events: none;
-      z-index: -1;
-    }
+  #chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
 
-    .app-header {
-      padding: 18px 22px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: var(--border-subtle);
-      background: linear-gradient(
-        to bottom,
-        rgba(15, 23, 42, 0.9),
-        rgba(15, 23, 42, 0.7)
-      );
-      backdrop-filter: blur(18px);
-    }
+  .msg {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    line-height: 1.45;
+    font-size: 15px;
+    white-space: pre-wrap;
+  }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+  .user {
+    background: var(--user);
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
 
-    .brand-avatar {
-      width: 32px;
-      height: 32px;
-      border-radius: 999px;
-      background: conic-gradient(
-        from 210deg,
-        #38bdf8,
-        #a855f7,
-        #f97316,
-        #38bdf8
-      );
-      padding: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  .bot {
+    background: var(--bot);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
 
-    .brand-avatar-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: inherit;
-      background: radial-gradient(circle at 30% 0%, #1f2937, #020617);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      font-weight: 600;
-      color: #e5e7eb;
-    }
+  #typing {
+    font-size: 14px;
+    color: var(--subtle);
+    padding-left: 4px;
+    display: none;
+  }
 
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+  #inputBar {
+    display: flex;
+    padding: 12px;
+    background: var(--panel);
+    border-top: 1px solid #1b1b22;
+  }
 
-    .brand-name {
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: 0.03em;
-    }
+  #message {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: #1a1a22;
+    color: var(--text);
+    font-size: 15px;
+  }
 
-    .brand-sub {
-      font-size: 11px;
-      color: var(--text-soft);
-    }
+  #send {
+    margin-left: 10px;
+    padding: 12px 20px;
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+    transition: 0.15s;
+  }
 
-    .status-pill {
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      border: 1px solid rgba(129, 140, 248, 0.5);
-      background: radial-gradient(circle at top left, #1d243a, #020617);
-      color: var(--accent-strong);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
-    }
-
-    .app-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 14px 18px 16px;
-      gap: 10px;
-      overflow: hidden;
-    }
-
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px 4px 6px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(148, 163, 184, 0.7) transparent;
-    }
-
-    .messages::-webkit-scrollbar {
-      width: 6px;
-    }
-    .messages::-webkit-scrollbar-thumb {
-      background: rgba(148, 163, 184, 0.7);
-      border-radius: 999px;
-    }
-
-    .msg-row {
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-      max-width: 100%;
-    }
-
-    .msg-row.user {
-      justify-content: flex-end;
-    }
-
-    .msg-row.assistant {
-      justify-content: flex-start;
-    }
-
-    .msg-bubble {
-      max-width: 72%;
-      padding: 10px 12px;
-      border-radius: var(--radius-md);
-      font-size: 14px;
-      line-height: 1.45;
-      border: 1px solid transparent;
-      word-wrap: break-word;
-      white-space: pre-wrap;
-    }
-
-    .msg-bubble.user {
-      background: linear-gradient(
-        135deg,
-        rgba(79, 70, 229, 0.9),
-        rgba(129, 140, 248, 0.95)
-      );
-      color: #e5e7eb;
-      border-color: rgba(191, 219, 254, 0.25);
-      border-bottom-right-radius: 4px;
-    }
-
-    .msg-bubble.assistant {
-      background: radial-gradient(circle at top left, #020617, #020617);
-      border-color: rgba(148, 163, 184, 0.4);
-      border-bottom-left-radius: 4px;
-      color: var(--text);
-    }
-
-    .msg-meta {
-      font-size: 11px;
-      color: var(--text-soft);
-      margin-top: 3px;
-    }
-
-    .msg-avatar {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      background: radial-gradient(circle at 30% 0%, #1f2937, #020617);
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      color: var(--text-soft);
-      flex-shrink: 0;
-    }
-
-    .msg-row.user .msg-avatar {
-      display: none;
-    }
-
-    .msg-row.assistant .msg-avatar {
-      margin-right: 4px;
-    }
-
-    .msg-image {
-      margin-top: 8px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      max-height: 220px;
-    }
-
-    .msg-image img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    .typing {
-      display: inline-flex;
-      gap: 4px;
-      align-items: center;
-    }
-
-    .typing-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 999px;
-      background: rgba(148, 163, 184, 0.9);
-      animation: pulse 1s infinite ease-in-out;
-    }
-
-    .typing-dot:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-    .typing-dot:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: translateY(0); opacity: 0.4; }
-      50% { transform: translateY(-3px); opacity: 1; }
-    }
-
-    .app-footer {
-      padding: 10px 16px 14px;
-      border-top: var(--border-subtle);
-      background: linear-gradient(
-        to top,
-        rgba(15, 23, 42, 0.96),
-        rgba(15, 23, 42, 0.85)
-      );
-      backdrop-filter: blur(18px);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-      align-items: flex-end;
-    }
-
-    .input-shell {
-      flex: 1;
-      background: radial-gradient(circle at top left, #020617, #020617);
-      border-radius: var(--radius-lg);
-      border: 1px solid rgba(148, 163, 184, 0.5);
-      padding: 8px 10px 8px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .input-top {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .input-textarea {
-      width: 100%;
-      border: none;
-      outline: none;
-      resize: none;
-      background: transparent;
-      color: var(--text);
-      font-size: 14px;
-      line-height: 1.4;
-      max-height: 120px;
-    }
-
-    .input-textarea::placeholder {
-      color: rgba(148, 163, 184, 0.8);
-    }
-
-    .input-meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: var(--text-soft);
-    }
-
-    .pill {
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      background: rgba(15, 23, 42, 0.9);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .pill-label {
-      font-size: 11px;
-    }
-
-    .pill-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(129, 140, 248, 0.9);
-    }
-
-    .btn {
-      border-radius: 999px;
-      border: none;
-      padding: 9px 16px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
-      white-space: nowrap;
-    }
-
-    .btn-primary {
-      background: linear-gradient(
-        135deg,
-        rgba(79, 70, 229, 0.95),
-        rgba(129, 140, 248, 1)
-      );
-      color: #e5e7eb;
-      box-shadow: 0 10px 25px rgba(79, 70, 229, 0.45);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: default;
-      box-shadow: none;
-      transform: none;
-    }
-
-    .btn-primary:not(:disabled):hover {
-      transform: translateY(-1px);
-      box-shadow: 0 14px 30px rgba(79, 70, 229, 0.6);
-    }
-
-    .btn-secondary {
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text-soft);
-      border: 1px solid rgba(148, 163, 184, 0.6);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(15, 23, 42, 1);
-    }
-
-    .file-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--text-soft);
-      cursor: pointer;
-    }
-
-    .file-label span.icon {
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      border: 1px solid rgba(148, 163, 184, 0.6);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-    }
-
-    .file-input {
-      display: none;
-    }
-
-    .error-banner {
-      font-size: 11px;
-      color: var(--danger);
-      display: none;
-    }
-
-    .error-banner.visible {
-      display: block;
-    }
-
-    @media (max-width: 720px) {
-      body {
-        padding: 10px;
-      }
-      .app-shell {
-        border-radius: 20px;
-      }
-      .msg-bubble {
-        max-width: 82%;
-      }
-      .brand-sub {
-        display: none;
-      }
-    }
-  </style>
+  #send:hover {
+    opacity: 0.85;
+  }
+</style>
 </head>
+
 <body>
-  <div class="app-shell">
-    <header class="app-header">
-      <div class="brand">
-        <div class="brand-avatar">
-          <div class="brand-avatar-inner">A</div>
-        </div>
-        <div class="brand-text">
-          <div class="brand-name">Abel</div>
-          <div class="brand-sub">Local-ish, gateway-routed, image-aware mischief engine</div>
-        </div>
-      </div>
-      <div class="status-pill">
-        <span class="status-dot"></span>
-        <span>Groq + LLaVA (HF)</span>
-      </div>
-    </header>
 
-    <main class="app-main">
-      <div id="messages" class="messages"></div>
-    </main>
+<div id="header">Abel</div>
 
-    <footer class="app-footer">
-      <div id="error" class="error-banner"></div>
-      <div class="input-row">
-        <div class="input-shell">
-          <textarea
-            id="input"
-            class="input-textarea"
-            rows="1"
-            placeholder="Ask something, or drop an image with a question…"
-          ></textarea>
-          <div class="input-meta-row">
-            <label class="file-label">
-              <span class="icon">+</span>
-              <span id="fileLabelText">Attach image</span>
-              <input id="fileInput" class="file-input" type="file" accept="image/*" />
-            </label>
-            <div class="pill">
-              <span class="pill-dot"></span>
-              <span class="pill-label">Free · Groq text · HF vision</span>
-            </div>
-          </div>
-        </div>
-        <button id="sendBtn" class="btn btn-primary">
-          <span>Send</span>
-        </button>
-      </div>
-    </footer>
-  </div>
+<div id="chat"></div>
+<div id="typing">Abel is thinking…</div>
 
-  <script>
-    const WORKER_URL = "https://chatter.cypher1010.workers.dev/";
-    const messagesEl = document.getElementById("messages");
-    const inputEl = document.getElementById("input");
-    const fileInputEl = document.getElementById("fileInput");
-    const fileLabelTextEl = document.getElementById("fileLabelText");
-    const sendBtn = document.getElementById("sendBtn");
-    const errorEl = document.getElementById("error");
+<div id="inputBar">
+  <input id="message" placeholder="Say something…" autocomplete="off">
+  <button id="send">Send</button>
+</div>
 
-    let isSending = false;
-    let attachedImageBase64 = null;
+<script>
+const WORKER_URL = "https://chatter.cypher1010.workers.dev/";
+const chat = document.getElementById("chat");
+const input = document.getElementById("message");
+const send = document.getElementById("send");
+const typing = document.getElementById("typing");
 
-    function appendMessage({ role, content, imageBase64, meta }) {
-      const row = document.createElement("div");
-      row.className = `msg-row ${role === "user" ? "user" : "assistant"}`;
+function addMessage(text, cls) {
+  const div = document.createElement("div");
+  div.className = "msg " + cls;
+  div.textContent = text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
 
-      const avatar = document.createElement("div");
-      avatar.className = "msg-avatar";
-      avatar.textContent = role === "user" ? "U" : "A";
+async function sendMessage() {
+  const text = input.value.trim();
+  if (!text) return;
 
-      const bubbleWrap = document.createElement("div");
-      const bubble = document.createElement("div");
-      bubble.className = `msg-bubble ${role}`;
-      bubble.textContent = content || "";
+  addMessage(text, "user");
+  input.value = "";
 
-      bubbleWrap.appendChild(bubble);
+  typing.style.display = "block";
 
-      if (imageBase64) {
-        const imgWrap = document.createElement("div");
-        imgWrap.className = "msg-image";
-        const img = document.createElement("img");
-        img.src = imageBase64;
-        imgWrap.appendChild(img);
-        bubbleWrap.appendChild(imgWrap);
-      }
+  const payload = {
+    messages: [{ role: "user", content: text }]
+  };
 
-      if (meta) {
-        const metaEl = document.createElement("div");
-        metaEl.className = "msg-meta";
-        metaEl.textContent = meta;
-        bubbleWrap.appendChild(metaEl);
-      }
-
-      if (role === "assistant") {
-        row.appendChild(avatar);
-        row.appendChild(bubbleWrap);
-      } else {
-        row.appendChild(bubbleWrap);
-      }
-
-      messagesEl.appendChild(row);
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-      return bubble;
-    }
-
-    function appendTyping() {
-      return appendMessage({
-        role: "assistant",
-        content: "",
-        meta: "Thinking…"
-      });
-    }
-
-    function setTypingBubbleContent(bubble, text) {
-      bubble.textContent = text;
-    }
-
-    function showError(msg) {
-      errorEl.textContent = msg;
-      errorEl.classList.add("visible");
-      setTimeout(() => errorEl.classList.remove("visible"), 5000);
-    }
-
-    function setSending(state) {
-      isSending = state;
-      sendBtn.disabled = state;
-    }
-
-    function readFileAsDataURL(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-    }
-
-    fileInputEl.addEventListener("change", async (e) => {
-      const file = e.target.files[0];
-      if (!file) {
-        attachedImageBase64 = null;
-        fileLabelTextEl.textContent = "Attach image";
-        return;
-      }
-      try {
-        attachedImageBase64 = await readFileAsDataURL(file);
-        fileLabelTextEl.textContent = "Image attached";
-      } catch {
-        attachedImageBase64 = null;
-        fileLabelTextEl.textContent = "Attach image";
-        showError("Failed to read image file.");
-      }
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
 
-    async function sendMessage() {
-      if (isSending) return;
+    const data = await res.json();
 
-      const text = inputEl.value.trim();
-      if (!text && !attachedImageBase64) return;
+    typing.style.display = "none";
 
-      errorEl.classList.remove("visible");
+    const reply =
+      data?.result?.response ||
+      data?.result?.output_text ||
+      data?.result?.choices?.[0]?.message?.content ||
+      "No response";
 
-      const userMsg = {
-        role: "user",
-        content: text || (attachedImageBase64 ? "Describe this image." : ""),
-        image_base64: attachedImageBase64 || null
-      };
+    addMessage(reply, "bot");
 
-      appendMessage({
-        role: "user",
-        content: userMsg.content,
-        imageBase64: attachedImageBase64 || null
-      });
+  } catch (err) {
+    typing.style.display = "none";
+    addMessage("Error: " + err.toString(), "bot");
+  }
+}
 
-      inputEl.value = "";
-      attachedImageBase64 = null;
-      fileInputEl.value = "";
-      fileLabelTextEl.textContent = "Attach image";
+send.onclick = sendMessage;
 
-      const typingBubble = appendTyping();
-      setSending(true);
+input.onkeydown = e => {
+  if (e.key === "Enter") sendMessage();
+};
+</script>
 
-      try {
-        const payload = { messages: [userMsg] };
-
-        const res = await fetch(WORKER_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-
-        let replyText = data?.result;
-        if (!replyText || typeof replyText !== "string") {
-          replyText = "I couldn’t find any response content from the model.";
-        }
-
-        setTypingBubbleContent(typingBubble, replyText);
-      } catch (err) {
-        setTypingBubbleContent(
-          typingBubble,
-          "Something went wrong talking to the model."
-        );
-        showError("Request failed. Check the Worker logs if this keeps happening.");
-      } finally {
-        setSending(false);
-      }
-    }
-
-    sendBtn.addEventListener("click", sendMessage);
-
-    inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-  </script>
 </body>
 </html>
